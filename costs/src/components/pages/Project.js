@@ -1,5 +1,8 @@
 import styles from './Project.module.css'
 
+import Loading from '../layout/Loading'
+import Container from '../layout/Container'
+
 import { useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
@@ -7,7 +10,8 @@ function Project(){
 
     const { id } = useParams()
     
-    const [priject, setProject] = useState([])
+    const [project, setProject] = useState([])
+    const [showProjectForm, setShowProjectForm] = useState(false)
 
     useEffect(() => {
 
@@ -25,8 +29,47 @@ function Project(){
 
     }, [id])
 
+    function toggleProjectForm(){
+        setShowProjectForm(!showProjectForm)
+    }
+
     return (
-        <p>projeto</p>
+        <>
+            {project.name ? (
+                
+               <div className={styles.project_details}>
+                <Container customClass="column">
+                    <div>
+                        <h1>Projeto: {project.name}</h1>
+                        <button onClick={toggleProjectForm}>{!showProjectForm ? 'Editar projeto' : 'fechar'}</button>
+                    </div>
+
+                    {!showProjectForm ? (
+
+                        <div className={styles.project_info}>
+                            <p> 
+                                <span>Categoria:</span> {project.category.name}  
+                            </p>
+                            <p> 
+                                <span>Total de Orçamento:</span> {project.budget}  
+                            </p>
+                            <p> 
+                                <span>Total de Utilizado:</span> {project.cost}  
+                            </p>
+                        </div>
+                    ) : (
+                        <div className={styles.project_info}>
+                            <p>Detalhes do project</p>
+                        </div>
+                    )}
+
+                </Container>
+               </div>
+            ) 
+            : (
+                <Loading/>
+            )}
+        </>
     )
 }
 
