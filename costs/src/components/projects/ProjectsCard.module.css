@@ -80,7 +80,7 @@
     margin-right: 0.5em;
 }
   
-.infra a:hover,
+.project_card_actions a:hover ,
 .project_card_actions button:hover {
     background-color: #222;
     color: #ffbb33;
