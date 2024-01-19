@@ -2,16 +2,20 @@ import styles from './Project.module.css'
 
 import Loading from '../layout/Loading'
 import Container from '../layout/Container'
+import ProjectForm from '../projects/ProjectForms'
 
 import { useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
 function Project(){
 
-    const { id } = useParams()
-    
+    let { id } = useParams()
     const [project, setProject] = useState([])
     const [showProjectForm, setShowProjectForm] = useState(false)
+    const [showServiceForm, setShowServiceForm] = useState(false)
+    const [services, setServices] = useState([])
+    const [message, setMessage] = useState('')
+    const [type, setType] = useState('success')
 
     useEffect(() => {
 
@@ -33,6 +37,31 @@ function Project(){
         setShowProjectForm(!showProjectForm)
     }
 
+    function editPost(project) {
+        
+        if (project.budget < project.cost) {
+          setMessage('O Orçamento não pode ser menor que o custo do projeto!')
+          setType('error')
+          return false
+        }
+    
+        fetch(`http://localhost:5000/projects/${project.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(project),
+        })
+          .then((resp) => resp.json())
+          .then((data) => {
+            setProject(data)
+            setShowProjectForm(!showProjectForm)
+            setMessage('Projeto atualizado!')
+            setType('success')
+          })
+      }
+
+
     return (
         <>
             {project.name ? (
@@ -41,12 +70,12 @@ function Project(){
                 <Container customClass="column">
                     <div>
                         <h1>Projeto: {project.name}</h1>
-                        <button onClick={toggleProjectForm}>{!showProjectForm ? 'Editar projeto' : 'fechar'}</button>
+                        <button className={styles.btn} onClick={toggleProjectForm}>{!showProjectForm ? 'Editar projeto' : 'fechar'}</button>
                     </div>
 
                     {!showProjectForm ? (
 
-                        <div className={styles.project_info}>
+                        <div className={styles.form}>
                             <p> 
                                 <span>Categoria:</span> {project.category.name}  
                             </p>
@@ -59,7 +88,13 @@ function Project(){
                         </div>
                     ) : (
                         <div className={styles.project_info}>
-                            <p>Detalhes do project</p>
+                            <ProjectForm
+                               handleSubmit={editPost} 
+                               btnText="Concluir edição"
+                               projectData={project}
+
+                            />
+                            
                         </div>
                     )}
 
